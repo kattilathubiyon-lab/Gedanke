@@ -1,0 +1,65 @@
+{
+  "expo": {
+    "name": "Guter GeDANKE",
+    "slug": "guter-gedanke",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "gutergedanke",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "de.gutergedanke.app",
+      "usesAppleSignIn": true,
+      "infoPlist": {
+        "CFBundleAllowMixedLocalizations": true
+      }
+    },
+    "android": {
+      "package": "de.gutergedanke.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#FAF8F3",
+        "foregroundImage": "./assets/images/android-icon-foreground.png",
+        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "output": "static",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-apple-authentication",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#FAF8F3",
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 160,
+          "dark": {
+            "backgroundColor": "#1F1E1A"
+          }
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "color": "#A8B8A1",
+          "defaultChannel": "gedanken"
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    },
+    "extra": {
+      "googleAuth": {
+        "iosClientId": "",
+        "androidClientId": "",
+        "webClientId": ""
+      }
+    }
+  }
+}
