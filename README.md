@@ -57,6 +57,12 @@ Then open the app in [Expo Go](https://expo.dev/go), an iOS simulator
 > Scheduled notifications require a real device or emulator — they are
 > gracefully disabled on web.
 
+### Installing on your iPhone / building for the stores
+
+EAS Build is fully configured (`eas.json`). See the step-by-step guide in
+[docs/EAS-BUILD.md](docs/EAS-BUILD.md) — ad-hoc install on your own iPhone,
+TestFlight, and Android APK builds.
+
 ### Regenerating brand assets
 
 Icon, splash and adaptive icons are rendered from the brand SVG:

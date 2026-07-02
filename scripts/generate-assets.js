@@ -95,6 +95,9 @@ render(svgCanvas(1024, { scale: 0.52 }), 1024, 'android-icon-foreground.png');
 // Android monochrome (themed icons): single-color silhouette.
 render(svgCanvas(1024, { scale: 0.52, monochrome: '#FFFFFF' }), 1024, 'android-icon-monochrome.png');
 
+// Android notification icon: white silhouette on transparency.
+render(svgCanvas(96, { scale: 0.95, monochrome: '#FFFFFF' }), 96, 'notification-icon.png');
+
 // Web favicon.
 render(svgCanvas(96, { background: CREAM, scale: 0.9 }), 96, 'favicon.png');
 
