@@ -109,12 +109,14 @@ export default function WelcomeScreen() {
             loading={busy === 'apple'}
             style={styles.button}
           />
-          <AuthButton
-            icon="logo-google"
-            label="Mit Google fortfahren"
-            onPress={handleGoogle}
-            style={styles.button}
-          />
+          {googleIds ? (
+            <AuthButton
+              icon="logo-google"
+              label="Mit Google fortfahren"
+              onPress={handleGoogle}
+              style={styles.button}
+            />
+          ) : null}
           <AuthButton
             icon="mail-outline"
             label="Mit E-Mail fortfahren"
