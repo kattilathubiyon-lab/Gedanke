@@ -58,6 +58,9 @@
       "reactCompiler": true
     },
     "extra": {
+      "eas": {
+        "projectId": "0eb2a1d3-01c3-4845-8240-6e00d2c8d402"
+      },
       "googleAuth": {
         "iosClientId": "",
         "androidClientId": "",
