@@ -1,8 +1,13 @@
 /**
- * Synthesizes the Guter GeDANKE notification sound: a soft, warm
+ * Synthesizes the ORIGINAL default notification chime: a soft, warm
  * music-box arpeggio (G5 → E5 → C5), like a small kalimba.
  *
- * Output: assets/sounds/gedanke.wav (44.1 kHz, 16-bit mono, ~2.2 s)
+ * NOTE: The app now ships a custom sound in assets/sounds/gedanke.wav
+ * (converted from assets/sounds/biyon-original.mp3). This script writes
+ * to gedanke-default.wav so it never overwrites the custom sound —
+ * to go back to the synthesized chime, rename its output to gedanke.wav.
+ *
+ * Output: assets/sounds/gedanke-default.wav (44.1 kHz, 16-bit mono, ~2.2 s)
  * Run: node scripts/generate-sound.js
  */
 const fs = require('fs');
@@ -58,7 +63,7 @@ header.writeUInt16LE(16, 34); // bits per sample
 header.write('data', 36);
 header.writeUInt32LE(data.length, 40);
 
-const out = path.join(__dirname, '..', 'assets', 'sounds', 'gedanke.wav');
+const out = path.join(__dirname, '..', 'assets', 'sounds', 'gedanke-default.wav');
 fs.mkdirSync(path.dirname(out), { recursive: true });
 fs.writeFileSync(out, Buffer.concat([header, data]));
-console.log(`✓ assets/sounds/gedanke.wav (${DURATION}s, ${(header.length + data.length) / 1024 | 0} KB)`);
+console.log(`✓ assets/sounds/gedanke-default.wav (${DURATION}s, ${(header.length + data.length) / 1024 | 0} KB)`);

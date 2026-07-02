@@ -21,9 +21,11 @@ Built with **Expo (React Native + TypeScript)** for iOS and Android.
   *Heutiger GeDANKE* with heart, save and share actions.
 - **Push notifications** — locally scheduled per your chosen frequency and
   times ("Ein GeDANKE für dich"), matching your chosen topics, with no
-  affirmation repeating within 30 days. Each notification plays a gentle
-  custom chime (a soft music-box arpeggio, toggleable in settings,
-  regenerate with `node scripts/generate-sound.js`).
+  affirmation repeating within 30 days. Each notification plays the
+  custom Guter GeDANKE chime (`assets/sounds/gedanke.wav`, toggleable in
+  settings). The original source file lives at
+  `assets/sounds/biyon-original.mp3`; a synthesized fallback chime can be
+  generated with `node scripts/generate-sound.js`.
 - **Gedanken archive** — every thought that reached you, newest first, with
   full-text search and category filter.
 - **Favoriten** — keep the thoughts that felt good.
