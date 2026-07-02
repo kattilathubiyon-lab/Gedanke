@@ -53,6 +53,8 @@ export interface Settings {
   /** Custom times as "HH:MM" — only used when frequency === 'custom'. */
   customTimes: string[];
   notificationsEnabled: boolean;
+  /** Play the gentle Guter GeDANKE chime with each notification. */
+  soundEnabled: boolean;
   darkMode: DarkModePreference;
 }
 
@@ -70,6 +72,7 @@ export const defaultSettings: Settings = {
   frequency: '1x',
   customTimes: ['09:00'],
   notificationsEnabled: false,
+  soundEnabled: true,
   darkMode: 'system',
 };
 

@@ -1,10 +1,19 @@
 import { thoughtById } from '@/data/affirmations';
 import { PlannedDelivery } from '@/data/types';
-import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
 
 const isNative = Platform.OS === 'ios' || Platform.OS === 'android';
+
+/** Filename of the gentle chime bundled via the expo-notifications plugin. */
+const SOUND_FILE = 'gedanke.wav';
+
+/**
+ * Android notification channels are immutable once created, so the
+ * sound preference maps to two separate channels.
+ */
+const CHANNEL_SOUND = 'gedanken-sanft';
+const CHANNEL_SILENT = 'gedanken-still';
 
 export function configureNotificationHandling() {
   if (!isNative) return;
@@ -12,25 +21,34 @@ export function configureNotificationHandling() {
     handleNotification: async () => ({
       shouldShowBanner: true,
       shouldShowList: true,
-      shouldPlaySound: false,
+      shouldPlaySound: true,
       shouldSetBadge: false,
     }),
   });
 }
 
+async function ensureAndroidChannels(): Promise<void> {
+  if (Platform.OS !== 'android') return;
+  const base = {
+    name: 'Gute Gedanken',
+    importance: Notifications.AndroidImportance.DEFAULT,
+    vibrationPattern: [0, 150, 100, 150],
+    lightColor: '#A8B8A1',
+  };
+  await Notifications.setNotificationChannelAsync(CHANNEL_SOUND, {
+    ...base,
+    sound: SOUND_FILE,
+  });
+  await Notifications.setNotificationChannelAsync(CHANNEL_SILENT, {
+    ...base,
+    name: 'Gute Gedanken (still)',
+    sound: null,
+  });
+}
+
 export async function requestNotificationPermission(): Promise<boolean> {
   if (!isNative) return false;
-  if (!Device.isDevice) {
-    // Simulators cannot receive push, but local scheduling still works.
-  }
-  if (Platform.OS === 'android') {
-    await Notifications.setNotificationChannelAsync('gedanken', {
-      name: 'Gute Gedanken',
-      importance: Notifications.AndroidImportance.DEFAULT,
-      vibrationPattern: [0, 150, 100, 150],
-      lightColor: '#A8B8A1',
-    });
-  }
+  await ensureAndroidChannels();
   const existing = await Notifications.getPermissionsAsync();
   if (existing.granted) return true;
   const requested = await Notifications.requestPermissionsAsync();
@@ -50,7 +68,8 @@ export async function hasNotificationPermission(): Promise<boolean> {
  */
 export async function syncScheduledNotifications(
   plan: PlannedDelivery[],
-  enabled: boolean
+  enabled: boolean,
+  soundEnabled: boolean
 ): Promise<PlannedDelivery[]> {
   if (!isNative) return plan;
   try {
@@ -58,6 +77,7 @@ export async function syncScheduledNotifications(
     if (!enabled) {
       return plan.map((p) => ({ ...p, notificationId: null }));
     }
+    await ensureAndroidChannels();
     const now = Date.now();
     const synced: PlannedDelivery[] = [];
     for (const p of plan) {
@@ -75,13 +95,19 @@ export async function syncScheduledNotifications(
         content: {
           title: 'Ein GeDANKE für dich',
           body: thought.text,
-          sound: false,
+          // iOS reads the sound from the content; Android from the channel.
+          sound: soundEnabled ? SOUND_FILE : false,
           data: { thoughtId: thought.id, plannedId: p.id },
         },
         trigger: {
           type: Notifications.SchedulableTriggerInputTypes.DATE,
           date: at,
-          channelId: Platform.OS === 'android' ? 'gedanken' : undefined,
+          channelId:
+            Platform.OS === 'android'
+              ? soundEnabled
+                ? CHANNEL_SOUND
+                : CHANNEL_SILENT
+              : undefined,
         },
       });
       synced.push({ ...p, notificationId });

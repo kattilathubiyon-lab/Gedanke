@@ -96,7 +96,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         const raw = await AsyncStorage.getItem(STORAGE_KEY);
         if (!cancelled && raw) {
           const parsed = JSON.parse(raw) as AppState;
-          setState(advance({ ...initialAppState, ...parsed }, new Date()));
+          const merged: AppState = {
+            ...initialAppState,
+            ...parsed,
+            // Deep-merge so newly added settings keep their defaults.
+            settings: { ...initialAppState.settings, ...parsed.settings },
+          };
+          setState(advance(merged, new Date()));
         }
       } catch {
         // Corrupted storage — start fresh rather than crash.
@@ -121,14 +127,25 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     if (!hydrated || !state.onboardingComplete) return;
     const key = JSON.stringify([
       state.settings.notificationsEnabled,
+      state.settings.soundEnabled,
       state.plan.map((p) => [p.at, p.thoughtId]),
     ]);
     if (key === lastSyncKey.current) return;
     lastSyncKey.current = key;
-    syncScheduledNotifications(state.plan, state.settings.notificationsEnabled).then((synced) => {
+    syncScheduledNotifications(
+      state.plan,
+      state.settings.notificationsEnabled,
+      state.settings.soundEnabled
+    ).then((synced) => {
       setState((s) => (s.plan.length === synced.length ? { ...s, plan: synced } : s));
     });
-  }, [hydrated, state.onboardingComplete, state.settings.notificationsEnabled, state.plan]);
+  }, [
+    hydrated,
+    state.onboardingComplete,
+    state.settings.notificationsEnabled,
+    state.settings.soundEnabled,
+    state.plan,
+  ]);
 
   // When the app returns to the foreground, settle due deliveries.
   useEffect(() => {

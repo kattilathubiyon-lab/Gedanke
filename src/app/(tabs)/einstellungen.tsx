@@ -45,6 +45,7 @@ export default function EinstellungenScreen() {
   const {
     state,
     updateName,
+    updateSettings,
     setInterests,
     setFrequency,
     setDarkMode,
@@ -199,6 +200,28 @@ export default function EinstellungenScreen() {
               <Switch
                 value={state.settings.notificationsEnabled}
                 onValueChange={handleNotificationsToggle}
+                trackColor={{ true: theme.colors.primary }}
+                thumbColor="#FFFFFF"
+              />
+            </View>
+            <View
+              style={[
+                styles.switchRow,
+                gentleShadow,
+                { backgroundColor: theme.colors.card, borderColor: theme.colors.border },
+              ]}
+            >
+              <View style={styles.switchText}>
+                <Text style={[styles.switchLabel, { color: theme.colors.text }]}>
+                  Sanfter Klang
+                </Text>
+                <Text style={[styles.switchHint, { color: theme.colors.textFaint }]}>
+                  Leise Melodie bei jedem Gedanken
+                </Text>
+              </View>
+              <Switch
+                value={state.settings.soundEnabled}
+                onValueChange={(soundEnabled) => updateSettings({ soundEnabled })}
                 trackColor={{ true: theme.colors.primary }}
                 thumbColor="#FFFFFF"
               />
