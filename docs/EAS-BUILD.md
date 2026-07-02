@@ -55,21 +55,34 @@ auf deinem Homescreen.
 ## Weg B: TestFlight (empfohlen für dauerhafte Nutzung)
 
 TestFlight-Builds laufen 90 Tage, aktualisieren sich bequem über die
-TestFlight-App und funktionieren auf jedem deiner Geräte:
+TestFlight-App und funktionieren auf jedem deiner Geräte.
 
 ```bash
-# Produktions-Build erstellen:
+# 1. Produktions-Build erstellen (beim ersten Mal interaktiv laufen
+#    lassen: EAS fragt nach deinem Apple-Login und legt Bundle-ID,
+#    Zertifikate und Provisioning-Profile automatisch an):
 eas build --platform ios --profile production
 
-# Build automatisch zu App Store Connect hochladen:
+# 2. Build zu App Store Connect hochladen. Falls die App dort noch
+#    nicht existiert, bietet EAS an, sie automatisch anzulegen:
 eas submit --platform ios --latest
 ```
 
 Danach in [App Store Connect](https://appstoreconnect.apple.com):
-**Meine Apps → Guter GeDANKE → TestFlight** — dich selbst als internen
-Tester hinzufügen, TestFlight-App auf dem iPhone installieren und
-die App laden. Von hier aus ist es später auch nur noch ein kleiner
-Schritt zur echten App-Store-Veröffentlichung.
+
+1. **Meine Apps → Guter GeDANKE → TestFlight** öffnen.
+2. Der Build erscheint nach wenigen Minuten Verarbeitung.
+   Die Export-Compliance-Frage entfällt — sie ist in der App bereits
+   mit „keine Verschlüsselung" beantwortet (`ITSAppUsesNonExemptEncryption`).
+3. Unter **Interne Tests** eine Testergruppe anlegen und dich selbst
+   (deine Apple-ID) hinzufügen.
+4. Auf dem iPhone die **TestFlight-App** installieren, Einladung
+   annehmen, App laden — fertig.
+
+Neue Versionen: einfach beide Befehle erneut ausführen. Die
+Build-Nummer zählt automatisch hoch, TestFlight aktualisiert die App.
+Von hier aus ist es später auch nur noch ein kleiner Schritt zur
+echten App-Store-Veröffentlichung.
 
 ## Was bereits konfiguriert ist
 

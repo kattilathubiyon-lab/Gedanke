@@ -74,17 +74,26 @@ function svgCanvas(size, { background = null, scale = 1, monochrome = null, wash
 </svg>`;
 }
 
-function render(svg, size, file) {
+function render(svg, size, file, { flatten = false } = {}) {
   const resvg = new Resvg(svg, { fitTo: { mode: 'width', value: size } });
-  const png = resvg.render().asPng();
+  let png = resvg.render().asPng();
+  if (flatten) {
+    // App Store Connect rejects app icons with an alpha channel —
+    // re-encode as opaque RGB (the icon has a full-bleed background).
+    const { PNG } = require('pngjs');
+    const decoded = PNG.sync.read(png);
+    png = PNG.sync.write(decoded, { colorType: 2 });
+  }
   fs.writeFileSync(path.join(OUT, file), png);
-  console.log(`✓ ${file} (${size}×${size})`);
+  console.log(`✓ ${file} (${size}×${size}${flatten ? ', no alpha' : ''})`);
 }
 
 fs.mkdirSync(OUT, { recursive: true });
 
 // App icon: full-bleed warm cream with a soft watercolor wash.
-render(svgCanvas(1024, { background: CREAM, wash: true, scale: 0.78 }), 1024, 'icon.png');
+render(svgCanvas(1024, { background: CREAM, wash: true, scale: 0.78 }), 1024, 'icon.png', {
+  flatten: true,
+});
 
 // Splash logo: transparent, generous padding around the mark.
 render(svgCanvas(512, { scale: 0.94 }), 512, 'splash-icon.png');

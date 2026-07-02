@@ -12,7 +12,8 @@
       "bundleIdentifier": "de.gutergedanke.app",
       "usesAppleSignIn": true,
       "infoPlist": {
-        "CFBundleAllowMixedLocalizations": true
+        "CFBundleAllowMixedLocalizations": true,
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
