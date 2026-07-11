@@ -1,111 +1,139 @@
-# Guter GeDANKE
+# Briefe, die bleiben
 
-*Jeden Tag eine kleine Affirmation.*
+Eine Web-App, die anonyme, **moderierte** Mutmach-Briefe zeigt. Besucher lesen
+einen Brief, der ihnen guttut, können weitere lesen und selbst einen schreiben.
+Warmer, ermutigender Ton, deutsches Publikum.
 
-A premium, minimalist affirmation app that delivers short, meaningful positive
-thoughts throughout the day — like receiving a caring message from a trusted
-friend. No feed, no likes, no streaks, no gamification. Just small positive
-thoughts.
+> **Wichtig:** Diese Seite ist ausdrücklich **keine Krisenintervention**. Sie
+> verlinkt aber an geeigneter Stelle professionelle Hilfe.
 
-Built with **Expo (React Native + TypeScript)** for iOS and Android.
+## Grundsätze (gelten für das gesamte Projekt)
 
-![Icon](assets/images/icon.png)
+- **Kein Auto-Publish.** Jeder eingereichte Brief startet mit Status `pending`
+  und wird **nie automatisch** veröffentlicht. Nur ein Mensch gibt frei. Es gibt
+  bewusst keinen Auto-Publish-Pfad – auch nicht in der Datenbank (siehe
+  RLS-Policies).
+- **Datensparsamkeit.** Keine Klarnamen, Briefe anonym, keine unnötigen
+  personenbezogenen Daten.
+- **EU-Region.** Alle Server-Ressourcen liegen in der EU (Supabase-Projekt in
+  Frankfurt / `eu-central-1`).
 
-## Features
+## Tech-Stack
 
-- **Authentication** — Sign in with Apple, Sign in with Google, or e-mail
-  sign-up (name + e-mail).
-- **Onboarding** — welcome, personalization (name + topics), notification
-  preferences (1x/2x/3x daily or custom times), notification permission.
-- **Daily affirmations** — the home screen greets you by name and shows the
-  *Heutiger GeDANKE* with heart, save and share actions.
-- **Push notifications** — locally scheduled per your chosen frequency and
-  times ("Ein GeDANKE für dich"), matching your chosen topics, with no
-  affirmation repeating within 30 days. Each notification plays the
-  custom Guter GeDANKE chime (`assets/sounds/gedanke.wav`, toggleable in
-  settings). The original source file lives at
-  `assets/sounds/biyon-original.mp3`; a synthesized fallback chime can be
-  generated with `node scripts/generate-sound.js`.
-- **Gedanken archive** — every thought that reached you, newest first, with
-  full-text search and category filter.
-- **Favoriten** — keep the thoughts that felt good.
-- **Einstellungen** — edit name, topics, notification frequency and times,
-  dark mode, sign out / delete account.
+- [Next.js](https://nextjs.org/) (App Router) + TypeScript
+- [Tailwind CSS](https://tailwindcss.com/) (v4)
+- [Supabase](https://supabase.com/) (Postgres, Auth, RLS) via
+  `@supabase/supabase-js` und `@supabase/ssr`
 
-## Topics
+## Ordnerstruktur
 
-Selbstliebe · Motivation · Dankbarkeit · Gelassenheit · Achtsamkeit ·
-Beziehungen · Mut · Erfolg · Gesundheit — with a curated German affirmation
-library (12 thoughts per topic).
+```
+app/                     # Next.js App Router (Layouts, Seiten, Route Handler)
+components/               # Wiederverwendbare UI-Komponenten
+lib/
+  supabase/
+    client.ts            # Browser-Client (Anon-Key) für Client Components
+    server.ts            # Server-Client (Anon-Key + Cookies) für Server-Kontext
+    admin.ts             # Service-Role-Client – NUR serverseitig, umgeht RLS
+supabase/
+  migrations/            # SQL-Migrationen (Schema + RLS-Policies)
+```
 
-## Design
+## Setup
 
-Warm cream (`#FAF8F3`) surfaces with soft watercolor washes, sage green
-(`#A8B8A1`) as the primary voice, light lavender (`#CFC4E6`) and soft gold
-(`#D8C38A`) accents, dark charcoal (`#333333`) text. Serif thoughts
-(Cormorant Garamond), sans UI (Nunito Sans). Gentle animations, rounded
-corners, generous white space, full dark-mode support.
-
-The brand word **DANKE** is always highlighted in gold.
-
-## Getting started
+### 1. Abhängigkeiten installieren
 
 ```bash
 npm install
-npx expo start
 ```
 
-Then open the app in [Expo Go](https://expo.dev/go), an iOS simulator
-(`i`), an Android emulator (`a`), or the browser (`w`).
+### 2. Supabase-Projekt anlegen (EU-Region!)
 
-> Scheduled notifications require a real device or emulator — they are
-> gracefully disabled on web.
+1. Auf [supabase.com](https://supabase.com/) einloggen und **New project** wählen.
+2. **Region:** unbedingt **Central EU (Frankfurt)** / `eu-central-1` auswählen,
+   damit alle Daten in der EU liegen. Die Region lässt sich nachträglich **nicht**
+   ändern – im Zweifel das Projekt neu anlegen.
+3. Ein sicheres Datenbank-Passwort vergeben und das Projekt erstellen.
 
-### Installing on your iPhone / building for the stores
+### 3. Datenbank-Migration einspielen
 
-EAS Build is fully configured (`eas.json`). See the step-by-step guide in
-[docs/EAS-BUILD.md](docs/EAS-BUILD.md) — ad-hoc install on your own iPhone,
-TestFlight, and Android APK builds.
+Die Migration liegt in `supabase/migrations/0001_initial_schema.sql`. Sie legt
+alle Tabellen an und aktiviert Row Level Security inklusive Policies.
 
-### Regenerating brand assets
+**Variante A – Supabase Dashboard (am einfachsten):**
 
-Icon, splash and adaptive icons are rendered from the brand SVG:
+1. Im Dashboard **SQL Editor** öffnen.
+2. Inhalt von `supabase/migrations/0001_initial_schema.sql` hineinkopieren.
+3. **Run** klicken.
+
+**Variante B – Supabase CLI:**
 
 ```bash
-node scripts/generate-assets.js
+# Einmalig: CLI installieren (siehe supabase.com/docs) und einloggen
+supabase login
+
+# Lokales Repo mit dem Remote-Projekt verknüpfen (Project-Ref aus dem Dashboard)
+supabase link --project-ref <your-project-ref>
+
+# Migration(en) einspielen
+supabase db push
 ```
 
-### Sign in with Google (optional)
+### 4. Environment-Variablen setzen
 
-Google sign-in needs OAuth client IDs. Create them in the Google Cloud
-Console and fill in `expo.extra.googleAuth` in `app.json`
-(`iosClientId`, `androidClientId`, `webClientId`). Without them the app
-falls back to e-mail sign-up. Sign in with Apple works out of the box on
-iOS builds (`usesAppleSignIn` is enabled).
+Kopiere die Vorlage und trage deine Werte aus dem Supabase-Dashboard
+(**Project Settings → API**) ein:
 
-## Architecture
-
-```
-src/
-  app/                  Expo Router routes
-    onboarding/         welcome → email → personalization → notifications → permission
-    (tabs)/             home (Heute) · gedanken · favoriten · einstellungen
-  components/           design-system components (Logo, Chip, ThoughtCard, …)
-  constants/theme.ts    palette, typography, spacing, light/dark themes
-  data/                 data model + German affirmation library
-  services/
-    thoughtEngine.ts    daily selection, 30-day no-repeat, 7-day delivery plan
-    notifications.ts    local notification scheduling
-    auth.ts             Apple / Google sign-in helpers
-  store/AppContext.tsx  app state, persisted with AsyncStorage
+```bash
+cp .env.example .env.local
 ```
 
-**Data model** (mirrors the product spec): `User`, `Category`, `Thought`,
-`UserThought` (delivered archive), `Favorite` — persisted locally.
+| Variable | Sichtbarkeit | Zweck |
+| --- | --- | --- |
+| `NEXT_PUBLIC_SUPABASE_URL` | öffentlich (Browser) | Projekt-URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | öffentlich (Browser) | Anon-Key; Zugriff wird per RLS begrenzt |
+| `SUPABASE_SERVICE_ROLE_KEY` | **geheim, nur Server** | Umgeht RLS vollständig |
 
-**Notification logic**: the app plans the next 7 days of deliveries (one
-thought per scheduled time, drawn from your topics, never repeating within
-30 days), schedules a local notification for each, and settles past-due
-deliveries into the archive whenever the app comes to the foreground. If
-you open the app before the first delivery of the day, a thought is
-delivered immediately so today is never empty.
+> **⚠️ Service-Role-Key:** Der `SUPABASE_SERVICE_ROLE_KEY` **umgeht Row Level
+> Security vollständig** und darf **ausschließlich serverseitig** verwendet
+> werden (Route Handler, Server Actions, Cron-Jobs). Er hat bewusst **kein**
+> `NEXT_PUBLIC_`-Präfix, damit Next.js ihn nicht ins Browser-Bundle aufnimmt.
+> Niemals in Client-Code importieren, niemals ins Git-Repo committen.
+> `.env.local` ist in `.gitignore` ausgeschlossen.
+
+### 5. Entwicklungsserver starten
+
+```bash
+npm run dev
+```
+
+App läuft auf [http://localhost:3000](http://localhost:3000).
+
+## Admin-/Moderationsrechte vergeben
+
+Voller Zugriff (alle Status lesen, moderieren, Reports/Feedback einsehen) ist an
+`profiles.is_admin = true` gebunden. Ein neuer auth-Nutzer bekommt automatisch
+ein Profil mit `is_admin = false`. Um jemanden zum Admin zu machen:
+
+1. Nutzer in Supabase anlegen (**Authentication → Users**) oder anmelden lassen.
+2. Im **SQL Editor** ausführen:
+
+   ```sql
+   update public.profiles set is_admin = true
+   where id = '<auth-user-id>';
+   ```
+
+## Datenmodell & Sicherheit (Kurzüberblick)
+
+| Tabelle | Öffentlicher Zugriff (anon) |
+| --- | --- |
+| `letters` | SELECT nur `status = 'approved'`; INSERT nur mit `status = 'pending'`; kein UPDATE/DELETE |
+| `feedback` | nur INSERT (kein SELECT) |
+| `reports` | nur INSERT (kein SELECT) |
+| `deliveries` | kein Zugriff (Insert serverseitig via Service Role) |
+| `subscribers` | kein Zugriff (komplett serverseitig) |
+| `profiles` | nur eigenes Profil lesen |
+
+Voller Zugriff auf alle Tabellen/Status ist ausschließlich Admins vorbehalten
+(RLS-Prüfung via `public.is_admin()`). Details und Kommentare siehe
+`supabase/migrations/0001_initial_schema.sql`.
