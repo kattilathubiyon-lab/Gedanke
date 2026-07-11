@@ -25,18 +25,46 @@ Warmer, ermutigender Ton, deutsches Publikum.
 - [Supabase](https://supabase.com/) (Postgres, Auth, RLS) via
   `@supabase/supabase-js` und `@supabase/ssr`
 
+## Funktionen (Prototyp)
+
+| Route | Beschreibung |
+| --- | --- |
+| `/` | Zeigt einen zufälligen **freigegebenen** Brief; „weiteren lesen", Ja/Nein-Feedback, Melden |
+| `/schreiben` | Brief einreichen – landet **immer** als `pending` |
+| `/danke` | Bestätigung nach dem Einreichen (Hinweis auf menschliche Prüfung) |
+| `/hilfe` | Professionelle Anlaufstellen + Krisenhinweis (keine Krisenintervention) |
+| `/admin/login` | Anmeldung für Moderator:innen (Supabase-Auth) |
+| `/admin` | Moderations-Dashboard: freigeben / ablehnen / markieren, Meldungen bearbeiten |
+| `POST /api/next-letter` | Liefert serverseitig einen zufälligen freigegebenen Brief + protokolliert die Auslieferung (Service Role) |
+| `POST /api/feedback`, `POST /api/report` | Anonymes Feedback bzw. Meldung (Anon-Client, RLS) |
+
+Die Auslieferung nutzt eine **anonyme** Session-Kennung (zufälliges Cookie
+`bdb_session`, kein Personenbezug), die die Middleware setzt.
+
 ## Ordnerstruktur
 
 ```
-app/                     # Next.js App Router (Layouts, Seiten, Route Handler)
-components/               # Wiederverwendbare UI-Komponenten
+app/
+  page.tsx               # Startseite: Brief lesen
+  schreiben/, danke/     # Brief einreichen
+  hilfe/                 # Anlaufstellen
+  admin/                 # Login + Moderations-Dashboard (+ actions.ts)
+  api/                   # Route Handler: next-letter, feedback, report
+  actions.ts             # Public Server Action (Brief einreichen)
+components/              # SiteHeader/Footer, LetterCard/Reader, SubmitLetterForm
 lib/
+  delivery.ts            # Auslieferungs-Logik (Service Role, server-only)
+  types.ts               # Gemeinsame TypeScript-Typen
   supabase/
     client.ts            # Browser-Client (Anon-Key) für Client Components
     server.ts            # Server-Client (Anon-Key + Cookies) für Server-Kontext
     admin.ts             # Service-Role-Client – NUR serverseitig, umgeht RLS
+    middleware.ts        # Session-Refresh + anonymes Session-Cookie
+    config.ts            # Konfigurations-/Env-Check
+middleware.ts            # Next.js Middleware (ruft supabase/middleware auf)
 supabase/
   migrations/            # SQL-Migrationen (Schema + RLS-Policies)
+  seed.sql               # Optionale Beispielbriefe (approved)
 ```
 
 ## Setup
@@ -79,6 +107,13 @@ supabase link --project-ref <your-project-ref>
 supabase db push
 ```
 
+#### Optional: Beispielbriefe einspielen
+
+Damit auf der Startseite sofort etwas zu lesen ist, kannst du
+`supabase/seed.sql` ausführen (Dashboard → SQL Editor, oder `supabase db reset`,
+das Migration + Seed neu einspielt). Diese Briefe werden bewusst von dir als
+Mensch direkt als `approved` eingefügt – das ist **kein** Auto-Publish-Pfad.
+
 ### 4. Environment-Variablen setzen
 
 Kopiere die Vorlage und trage deine Werte aus dem Supabase-Dashboard
@@ -115,13 +150,19 @@ Voller Zugriff (alle Status lesen, moderieren, Reports/Feedback einsehen) ist an
 `profiles.is_admin = true` gebunden. Ein neuer auth-Nutzer bekommt automatisch
 ein Profil mit `is_admin = false`. Um jemanden zum Admin zu machen:
 
-1. Nutzer in Supabase anlegen (**Authentication → Users**) oder anmelden lassen.
+1. Nutzer in Supabase anlegen (**Authentication → Users → Add user**, mit
+   E-Mail + Passwort). Beim Anlegen entsteht per Trigger automatisch ein Profil
+   mit `is_admin = false`.
 2. Im **SQL Editor** ausführen:
 
    ```sql
    update public.profiles set is_admin = true
    where id = '<auth-user-id>';
    ```
+
+3. Unter [`/admin/login`](http://localhost:3000/admin/login) mit E-Mail und
+   Passwort anmelden. Das Dashboard unter `/admin` zeigt dann wartende,
+   markierte und freigegebene Briefe sowie offene Meldungen.
 
 ## Datenmodell & Sicherheit (Kurzüberblick)
 
