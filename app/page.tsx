@@ -16,8 +16,8 @@ export default async function Home() {
         <p className="text-sm uppercase tracking-widest opacity-60">
           Ein Brief für dich
         </p>
-        <h1 className="mt-2 text-2xl font-semibold leading-snug sm:text-3xl">
-          Manchmal reicht ein paar Zeilen, um sich weniger allein zu fühlen.
+        <h1 className="mt-2 font-serif text-3xl font-medium leading-snug tracking-[-0.01em] sm:text-4xl">
+          Manchmal reichen ein paar Zeilen, um sich weniger allein zu fühlen.
         </h1>
       </section>
 
@@ -35,7 +35,9 @@ export default async function Home() {
       )}
 
       <section className="mt-12 rounded-2xl bg-black/[0.03] p-6 dark:bg-white/5">
-        <h2 className="text-lg font-medium">Möchtest du selbst Mut machen?</h2>
+        <h2 className="font-serif text-xl font-medium">
+          Möchtest du selbst Mut machen?
+        </h2>
         <p className="mt-1 text-sm leading-relaxed opacity-80">
           Schreib einen Brief an jemanden, den du nie treffen wirst. Jeder Brief
           wird von einem Menschen gelesen, bevor er erscheint.

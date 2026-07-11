@@ -18,7 +18,7 @@ export default async function SchreibenPage({
 
   return (
     <main className="mx-auto max-w-2xl px-6 py-12">
-      <h1 className="text-2xl font-semibold">Einen Brief schreiben</h1>
+      <h1 className="font-serif text-3xl font-medium">Einen Brief schreiben</h1>
       <p className="mt-2 leading-relaxed opacity-80">
         Deine Zeilen können jemandem an einem schweren Tag Halt geben. Der Brief
         erscheint anonym und wird vorher von einem Menschen gelesen.

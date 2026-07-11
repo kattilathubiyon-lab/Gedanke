@@ -3,7 +3,7 @@ import Link from "next/link";
 export default function DankePage() {
   return (
     <main className="mx-auto flex max-w-2xl flex-col items-start gap-4 px-6 py-16">
-      <h1 className="text-2xl font-semibold">Danke für deinen Brief.</h1>
+      <h1 className="font-serif text-3xl font-medium">Danke für deinen Brief.</h1>
       <p className="leading-relaxed opacity-80">
         Er ist eingegangen und wartet nun auf die Prüfung durch einen Menschen.
         Erst danach kann er anderen angezeigt werden – automatisch veröffentlicht

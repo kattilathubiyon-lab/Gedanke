@@ -98,7 +98,7 @@ function ResourceItem({ r }: { r: Resource }) {
 export default function HilfePage() {
   return (
     <main className="mx-auto max-w-2xl px-6 py-12">
-      <h1 className="text-2xl font-semibold">Hilfe &amp; Anlaufstellen</h1>
+      <h1 className="font-serif text-3xl font-medium">Hilfe &amp; Anlaufstellen</h1>
       <p className="mt-2 leading-relaxed opacity-80">
         „Briefe, die bleiben“ ist ein Ort für ermutigende Worte – aber{" "}
         <strong>keine Krisenintervention</strong>. Wenn du gerade nicht mehr
